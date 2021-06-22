@@ -21,10 +21,10 @@ async def leave_from_channel(id):
         return False
 
 async def spamming(spam_list, settings, db):
-    setting = db.settings()
     await client.send_message(config.ADMIN, settings[3])
-    while setting[4] == 1:
+    while settings[4] == 1:
         for chat in spam_list:
+            settings = db.settings()
             try:
                 with open(f'{config.DIR}{settings[1]}', 'rb') as photo:
                     await client.send_photo(chat['id'], photo, caption=f"{settings[2]}\n\n{chat['text']}")
@@ -35,4 +35,6 @@ async def spamming(spam_list, settings, db):
                     await bot.send_message(config.ADMIN, f'[LOG] Cообщение в {chat["title"]} было успешно отправленно.')
                 except Exception as e:
                     await bot.send_message(config.ADMIN, f'[LOG] Cообщение в {chat["title"]} не было отправлено из-за ошибки: {e}')
-            await asyncio.sleep(10)
+            await asyncio.sleep(settings[5]*60)
+            if settings[4] != 1:
+                break

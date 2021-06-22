@@ -1,10 +1,10 @@
 
 #BOT:
-TOKEN = "1821394709:AAH94hnPfYrNujMdif8xrHQxcxJwsrqMPa0"
-ADMIN = 392192947
+TOKEN = "" # ТОКЕН БОТА
+ADMIN = 392192947 # ИД АДМИНА, узнать свой айди - @get_any_telegram_id_bot
 
-DIR = ""
+DIR = "" # Путь к файлу, если нужно
 
-#USER:
-API_ID = 6154393
-API_HASH = "31bd64830a0c1fad194f706462cfe7fe"
+#USER: # https://my.telegram.org/auth
+API_ID = 6623613
+API_HASH = "3504ada74bdd34a2e5bf510e1bfd6460"

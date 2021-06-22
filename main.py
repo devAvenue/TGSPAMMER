@@ -18,7 +18,7 @@ db = DBConnection()
 
 def welcome_keyboard():
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    keyboard.add(*[types.KeyboardButton(name) for name in ['❓ Доступные каналы']])
+    keyboard.add(*[types.KeyboardButton(name) for name in ['❓ Доступные каналы', '🔢 Интервал']])
     keyboard.add(*[types.KeyboardButton(name) for name in ['📑 Пост', '➡️ START']])
     return keyboard
 
@@ -34,6 +34,9 @@ class addition(StatesGroup):
 
 class post(StatesGroup):
     text = State()
+
+class time(StatesGroup):
+    timeout = State()
 
 @dp.message_handler(state=addition.id)
 async def input_report(m: types.Message, state: FSMContext):
@@ -52,6 +55,17 @@ async def input_report(m: types.Message, state: FSMContext):
     await bot.send_message(m.chat.id, f'☑️ Текст для поста был обновлен.')
     await state.finish()
 
+@dp.message_handler(state=time.timeout)
+async def input_report(m: types.Message, state: FSMContext):
+    try:
+        if int(m.text) > 1:
+            db.setTimeOut(m.text)
+            await bot.send_message(m.chat.id, f'☑️ Интервал рассылки был успешно обновлен.')
+        else:
+            await bot.send_message(m.chat.id, f'❌ Введите число больше 1.')
+    except:
+        await bot.send_message(m.chat.id, f'❌ Введите число.')
+    await state.finish()
 
 @dp.message_handler(content_types='text', state="*")
 async def echo_message(m: types.Message):
@@ -71,6 +85,11 @@ async def echo_message(m: types.Message):
     elif m.text == '🛑 Остановить спам':
         db.setSpam(0)
         await bot.send_message(m.chat.id, '😊 Отправляю последние сообщения и закругляюсь', reply_markup=welcome_keyboard())
+    elif m.text == '🔢 Интервал':
+        settings = db.settings()
+        keyboard.add(*[types.InlineKeyboardButton(text=name, callback_data=cb) for name, cb in {'🕘 Изменить интервал':'INTERVAL'}.items()])
+        await bot.send_message(m.chat.id, f'🔃 Текущий интервал {settings[5]} минут(а)', reply_markup=keyboard)
+
     elif m.text == '📑 Пост':
         settings = db.settings()
         try:
@@ -124,6 +143,9 @@ async def poc_callback_but(c:types.CallbackQuery, state: FSMContext):
         await post.first()
     elif 'EDIT_PHOTO' == c.data:
         await bot.send_message(m.chat.id, '📄 Отправь мне фото для изменения:')
+    elif 'INTERVAL' == c.data:
+        await bot.send_message(m.chat.id, '📄 Отправь мне интервал рассылки между чатами (в минутах):')
+        await time.first()
 
 
 @dp.message_handler(content_types=["photo"])

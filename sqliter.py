@@ -34,6 +34,10 @@ class DBConnection(object):
         table = self.c.execute(f'UPDATE SETTINGS SET SPAM = (?) WHERE ID = (?)', [spam,1]).fetchone()
         return table
 
+    def setTimeOut(self, time):
+        table = self.c.execute(f'UPDATE SETTINGS SET TIMEOUT = (?) WHERE ID = (?)', [time, 1]).fetchone()
+        return table
+
     def __del__(self):
         self.c.close()
         self.conn.close()
